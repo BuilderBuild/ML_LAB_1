@@ -1,0 +1,86 @@
+LAB-1, Divyansh Verma
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as mat
+
+
+dataset=pd.read_csv("house_prices_practice.csv")
+dataset.head() #showing the first 5 rows of the data *** unless any other value is put in the bracket
+
+dataset.tail(56) #show the last 5 rows of the data **** unless any other value is put in the bracket
+
+dataset.shape # tell about the shape of the data ** remove the header/title row
+
+dataset.info # tell each and every detail abt the whole table
+
+dataset.describe() # it kind of give mist of the stastic data for the DATA
+
+print(dataset.isnull().sum())
+# tell aboout all the value that don't possees any value and tell how many
+
+print(dataset.duplicated().sum())
+# tell the total of all, the items that are duplicated
+
+x=dataset['GrLivArea'].values
+y=dataset['SalePrice'].values
+x_norm = (x-x.mean())/x.std()
+
+mat.plot(x,y)
+mat.show()
+
+m=len(y)
+theta0,theta1 = 0.0,0.0
+alpha=1
+iterations = 120
+
+
+for i in range(iterations):
+  y_pred = theta0 + theta1*x_norm
+  error= y_pred - y
+  theta0 -= alpha * (1/m) * np.sum(error)
+  theta1 -= alpha * (1/m) * np.sum(error*x_norm)
+
+print("Theta0: ",theta0)
+print("Theta1: ",theta1)
+
+mat.scatter(x, y)
+mat.plot(x, theta0 + theta1 * x_norm, color='red')
+mat.xlabel("GrLivArea")
+mat.ylabel("SalePrice")
+mat.title("Linear Regression From Scratch")
+mat.show()
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error,accuracy_score
+
+x=dataset.drop(['Id','SalePrice'],axis=1)
+y=dataset['SalePrice']
+
+X_train, X_test, y_train,y_test = train_test_split(
+    x ,y, test_size=0.2, random_state=42
+    )
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+y_pred = model.predict(X_test)
+
+mat.figure(figsize=(15,30))
+mat.plot(y_test.values,color='blue',marker='o',label='Actual')
+mat.plot(y_pred,color='red', marker='s',label='Predicted')
+mat.xlabel("House")
+mat.ylabel("Sale Price")
+mat.title("Actual vs predicted HOUSE prices")
+mat.legend()
+mat.show()
+
+r2=r2_score(y_test,y_pred)
+mse=mean_squared_error(y_test,y_pred)
+rmse = np.sqrt(mean_squared_error(y_test,y_pred))
+print("R2 score: ",round(r2,4))
+print("MSE:",round(mse, 4))
+print("Rmse: ",round(rmse,4))
+
+
